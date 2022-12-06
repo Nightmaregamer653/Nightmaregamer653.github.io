@@ -1,0 +1,38 @@
+.Title{
+    font-size: 100px;
+    margin-left: 10%;
+}
+
+.HardText{
+    font-size: 60px;
+    margin-left: 10%;
+}
+
+.info{
+    font-size: 30px;
+    margin-left: 10%;
+}
+
+p+* a {
+    display: block;
+    font-size: 95%;
+    content: "HTML";
+    background: rgba(0, 0, 0, 0);
+    overflow: hidden;
+}
+
+iframe {
+    top: 0;
+    z-index: -1;
+}
+iframe.clickableIFrames {
+    position: absolute;
+}
+iframe.clickableIFrames,
+p+* a {
+    height: 500px;
+    width: 100%;
+}
+
+li>a {
+    position: relative !important;
