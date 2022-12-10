@@ -1,0 +1,44 @@
+.title{
+    font-size: 150px;
+    margin-left: 10%;
+}
+
+.normalText{
+    font-size: 50px;
+    margin-left: 10%;
+}
+
+.Speech{
+    font-size: 50px;
+    margin-left: 10%;
+    color: dimgrey;
+    margin-bottom: 0px;
+}
+
+.nameOfPerson{
+    font-size: 20px;
+    margin-left: 10%;
+    color: gray;
+    margin-top: 0px;
+    margin-right: 50%;
+}
+
+.image{
+    width: 50%;
+    margin-left: 10%;
+}
+
+.imageLink{
+    margin-left: 10%;
+    font-size: 10px;
+}
+
+.farmerShot{
+    width: 20%;
+    margin-left: 10%;    
+}
+
+.endMessage{
+    margin-left: 10%;
+    font-size: 100px;
+}
