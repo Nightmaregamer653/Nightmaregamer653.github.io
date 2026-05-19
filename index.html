@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" style="--bg: #ffffff; --text: #1e1e1e; --border: #d0d0d0; --accent: #0077cc; --sub: #555555; --section-border: #0077cc; --input-bg: #f0f0f0; --input-border: #ccc; --hover-bg: #f9f9f9; --item-hover: #eaf3fb; --btn-bg: #0077cc; --btn-text: #fff; --danger: #d32f2f; --warn: #e65100; --danger-hover: #b71c1c; --tag-bg: #e8e8e8; --tag-text: #333; --note-dot-color: #2e7d32; --img-border: #ccc; --selected-bg: #d0ebff; --font-scale: 1;"><head><meta charset="UTF-8">
+<html lang="en" style="--bg: #ffffff; --text: #1e1e1e; --border: #d0d0d0; --accent: #0077cc; --sub: #555555; --section-border: #0077cc; --input-bg: #f0f0f0; --input-border: #ccc; --hover-bg: #f9f9f9; --item-hover: #eaf3fb; --btn-bg: #0077cc; --btn-text: #fff; --danger: #d32f2f; --warn: #e65100; --danger-hover: #b71c1c; --tag-bg: #e8e8e8; --tag-text: #333; --note-dot-color: #2e7d32; --img-border: #ccc; --selected-bg: #d0ebff; --font-scale: 1"><head></style><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Islam Reference – Enhanced with Subsection Drag &amp; More</title>
 <style>
@@ -115,6 +115,8 @@ button:hover:not(:disabled) { opacity: 0.85; }
 .link-wrapper { display: flex; align-items: center; gap: 0.15rem; flex-wrap: wrap; padding: 0.15rem 0; }
 .link-wrapper a { flex: 1; min-width: 200px; font-size: 0.85rem; color: var(--accent); text-decoration: none; padding: 0.1rem 0; }
 .link-wrapper a:hover { text-decoration: underline; }
+body.hide-daif .link-wrapper.daif-hidden { display: none !important; }
+body.hide-daif .item.all-daif { display: none !important; }
 .grade-badge { display: inline-block; font-size: 0.68rem; font-weight: 700; padding: 0.08rem 0.4rem; border-radius: 3px; margin-left: 0.25rem; white-space: nowrap; line-height: 1.4; letter-spacing: 0.02em; }
 .grade-sahih { background: #2e7d32; color: #fff; }
 .grade-hasan { background: #e65100; color: #fff; }
@@ -675,11 +677,11 @@ body.dark .diff-new { background:#0a2a0a; }
     <div class="settings-section">
       <h3 class="settings-heading">🎨 Theme</h3>
       <div style="display:flex;gap:0.4rem;flex-wrap:wrap;margin-bottom:0.6rem;" id="themePresets">
-        <button class="theme-btn" data-theme="light" style="border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent);">☀️ Light</button>
-        <button class="theme-btn" data-theme="dark" style="border-color: var(--border); box-shadow: none;">🌙 Dark</button>
-        <button class="theme-btn" data-theme="sepia" style="border-color: var(--border); box-shadow: none;">📜 Sepia</button>
-        <button class="theme-btn" data-theme="green" style="border-color: var(--border); box-shadow: none;">🌿 Green</button>
-        <button class="theme-btn" data-theme="ocean" style="border-color: var(--border); box-shadow: none;">🌊 Ocean</button>
+        <button class="theme-btn" data-theme="light">☀️ Light</button>
+        <button class="theme-btn" data-theme="dark">🌙 Dark</button>
+        <button class="theme-btn" data-theme="sepia">📜 Sepia</button>
+        <button class="theme-btn" data-theme="green">🌿 Green</button>
+        <button class="theme-btn" data-theme="ocean">🌊 Ocean</button>
       </div>
       <div style="margin-top:0.5rem;">
         <details class="settings-details">
@@ -30945,7 +30947,7 @@ function renderAll(filter = "") {
       sub.items.forEach((item, ii) => {
         // Handle all tabs bookmark view
         if (filterBookmarked && filterBookmarkedAllTabs && !item.bookmarked) return;
-        if (filterDaif && item.urls.some(u=>u.grade) && item.urls.every(u=>!u.grade || gradeClass(u.grade)==='grade-daif')) return;
+        const allDaif = item.urls.length && item.urls.every(u => u.grade && gradeClass(u.grade)==='grade-daif');
         if (filterTag && !item.tags.some(t => t.toLowerCase().includes(filterTag))) return;
         const titleText = (item.desc+" "+(item.note||"")+" "+(item.translation||"")+" "+(item.pageRef||"")).toLowerCase();
         const linkText = item.urls.map(l=>l.url).join(" ").toLowerCase();
@@ -30967,7 +30969,7 @@ function renderAll(filter = "") {
         }
         if (!matches) return;
         const itemDiv = document.createElement("div");
-        itemDiv.className = "item";
+        itemDiv.className = "item" + (allDaif ? " all-daif" : "");
         itemDiv.dataset.si = si; itemDiv.dataset.sbi = sbi; itemDiv.dataset.ii = ii;
         visibleItems.push({si, sbi, ii, el: itemDiv});
         // Star bookmark
@@ -30994,7 +30996,7 @@ function renderAll(filter = "") {
         if (item.urls.length) {
           const linksDiv = document.createElement("div"); linksDiv.className = "links";
           item.urls.forEach((l, li) => {
-            const wrapper = document.createElement("div"); wrapper.className = "link-wrapper";
+            const wrapper = document.createElement("div"); wrapper.className = "link-wrapper" + (l.grade && gradeClass(l.grade)==='grade-daif' ? " daif-hidden" : "");
             const a = document.createElement("a"); a.href = l.url; a.textContent = l.url; a.target="_blank";
             if (l.note) a.title = l.note;
             wrapper.appendChild(a);
@@ -31392,9 +31394,9 @@ document.getElementById("bookmarkFilterBtn").onclick = function() {
 // ==================== DA'IF FILTER ====================
 document.getElementById("daifFilterBtn").onclick = function() {
   filterDaif = !filterDaif;
+  document.body.classList.toggle("hide-daif", filterDaif);
   this.classList.toggle("active", filterDaif);
   this.innerHTML = filterDaif ? "🙈 Da'if Hidden" : "🙈 Hide Da'if";
-  renderAll(searchBox.value);
 };
 
 // ==================== TAG FILTER ====================
@@ -32095,14 +32097,18 @@ function escH(s) { return (s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").rep
 
 function gradeClass(g) {
   if (!g) return 'grade-other';
-  const s = g.toLowerCase().replace(/[^a-z\u00e0-\u00ff]/g, '');
+  const norm = g.normalize('NFKD').toLowerCase().replace(/[\u0300-\u036f\u064b-\u0652\u02bf\u02be\u2018\u2019\u201B'`\u2019]/g, '');
+  const s = norm.replace(/[^a-z\u0600-\u06ff]/g, '');
   if (s.startsWith('sahih') || s.startsWith('sah') || s.startsWith('\u1e63a')) return 'grade-sahih';
   if (s.startsWith('hasan') || s.startsWith('hassan')) return 'grade-hasan';
-  if (s.startsWith("daif") || s.startsWith("da'if") || s.startsWith("da`if") || s.startsWith('da\u2019if') || s.startsWith('dayif')) return 'grade-daif';
+  if (s.startsWith('daif') || s.startsWith('dayif')) return 'grade-daif';
   if (s.includes('muttafaq') || s.includes('muttifaq')) return 'grade-muttafaqun';
   if (s.includes('shadhdh')) return 'grade-shadhdh';
   if (s.includes('munkar')) return 'grade-munkar';
   if (s.includes('maudu') || s.includes('mawdu')) return 'grade-daif';
+  if (s.includes('daif') || s.includes('dayif')) return 'grade-daif';
+  if (norm.includes('\u0636\u0639\u064a\u0641')) return 'grade-daif';
+  if (norm.includes('\u0645\u062a\u0641\u0642')) return 'grade-muttafaqun';
   if (s.includes('qawi')) return 'grade-sahih';
   if (s.includes('jayyid')) return 'grade-hasan';
   return 'grade-other';
